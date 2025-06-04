@@ -69,12 +69,20 @@ fim_incrementa:
 ; --- Delay 5ms aproximado ---
 delay_5ms:
 	ldi r20, 5
+	rcall display_digit_dezena
+	rcall display_digit_unidade
 delay_outer:
 	ldi r19, 80
+	rcall display_digit_dezena
+	rcall display_digit_unidade
 delay_middle:
 	ldi r18, 255
+	rcall display_digit_dezena
+	rcall display_digit_unidade
 delay_inner:
 	dec r18
+	rcall display_digit_dezena
+	rcall display_digit_unidade
 	brne delay_inner
 	dec r19
 	brne delay_middle
