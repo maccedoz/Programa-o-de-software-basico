@@ -9,20 +9,6 @@
 
 .org 0x0000
 	rjmp main
-
-; Tabela de segmentos
-table:
-	.db 0b00111111 ; 0
-	.db 0b00000110 ; 1
-	.db 0b01011011 ; 2
-	.db 0b01001111 ; 3
-	.db 0b01100110 ; 4
-	.db 0b01101101 ; 5
-	.db 0b01111101 ; 6
-	.db 0b00000111 ; 7
-	.db 0b01111111 ; 8
-	.db 0b01101111 ; 9
-
 main:
 	; Configura PB0-PB6 como saída (segmentos)
 	ldi aux, 0xFF
@@ -95,3 +81,16 @@ delay_inner:
 	dec r20
 	brne delay_outer
 	ret
+
+; Tabela de segmentos
+table:
+	.db 0b00111111 ; 0
+	.db 0b00000110 ; 1
+	.db 0b01011011 ; 2
+	.db 0b01001111 ; 3
+	.db 0b01100110 ; 4
+	.db 0b01101101 ; 5
+	.db 0b01111101 ; 6
+	.db 0b00000111 ; 7
+	.db 0b01111111 ; 8
+	.db 0b01101111 ; 9
