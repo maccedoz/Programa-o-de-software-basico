@@ -10,7 +10,7 @@
 .org 0x0000
 	rjmp main
 
-; Tabela de segmentos (sem PB7)
+; Tabela de segmentos
 table:
 	.db 0b00111111 ; 0
 	.db 0b00000110 ; 1
@@ -25,7 +25,6 @@ table:
 
 main:
 	; Configura PB0-PB6 como saída (segmentos)
-	; PB7 será usado para seleção da casa (dezena/unidade)
 	ldi aux, 0xFF
 	out DDRB, aux
 
@@ -96,4 +95,3 @@ delay_inner:
 	dec r20
 	brne delay_outer
 	ret
-oq está errado
