@@ -62,7 +62,7 @@ display_digit_dezena:
 	add ZL, index2
 	adc ZH, r1
 	lpm aux, Z
-	neg aux
+	com aux
 	out PORTB, aux
 	sbi PORTB, 7              ; Liga PB7 (seleciona dezena)
 	ret
