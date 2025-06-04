@@ -4,7 +4,7 @@
 
 ; Definições de registradores
 .def index = r24        ; Unidade (0-9)
-.def index2 = r20       ; Dezena (0-9)
+.def index2 = r23       ; Dezena (0-9)
 .def aux = r22          ; Auxiliar
 
 .org 0x0000
@@ -39,7 +39,6 @@ loop:
 	rcall delay_5ms
 
 	; Exibe dezena (PB7 ligado)
-	sbi PORTB, 7              ; Liga PB7 (seleciona dezena)
 	rcall display_digit_dezena
 	rcall delay_5ms
 
@@ -64,7 +63,9 @@ display_digit_dezena:
 	add ZL, index2
 	adc ZH, r1
 	lpm aux, Z
+	neg aux
 	out PORTB, aux
+	sbi PORTB, 7              ; Liga PB7 (seleciona dezena)
 	ret
 
 ; --- Incrementa contador (0-99) ---
