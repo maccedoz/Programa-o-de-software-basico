@@ -2,81 +2,97 @@
 .include "../m328Pdef.inc"
 .list
 
-.def index = r24
-.def aux = r22
-.def index2 = r20
+; Definições de registradores
+.def index = r24        ; Unidade (0-9)
+.def index2 = r20       ; Dezena (0-9)
+.def aux = r22          ; Auxiliar
 
 .org 0x0000
 	rjmp main
-	
+
+; Tabela de segmentos (sem PB7)
 table:
-	.db 0b0111111
-	.db 0b00000110
-	.db 0b1011011
-	.db 0b1001111
-	.db 0b1100110
-	.db 0b1101101
-	.db 0b1111101
-	.db 0b0000111
-	.db 0b1111111
+	.db 0b00111111 ; 0
+	.db 0b00000110 ; 1
+	.db 0b01011011 ; 2
+	.db 0b01001111 ; 3
+	.db 0b01100110 ; 4
+	.db 0b01101101 ; 5
+	.db 0b01111101 ; 6
+	.db 0b00000111 ; 7
+	.db 0b01111111 ; 8
+	.db 0b01101111 ; 9
 
 main:
-	; Configura PB0-PB7 como saída
+	; Configura PB0-PB6 como saída (segmentos)
+	; PB7 será usado para seleção da casa (dezena/unidade)
 	ldi aux, 0xFF
 	out DDRB, aux
-	ldi index2, 0
-    ldi index, 0
-	rjmp display1  ; começa em display1, ajustei para seguir o fluxo
 
-display1:
-    ; Configura Z para apontar para o início da tabela
-    ldi ZH, high(table*2)  
-    ldi ZL, low(table*2)
-    add ZL, index         
-    adc ZH, r1           
-
-    ; Lê padrão da tabela
-    lpm aux, Z
-    out PORTB, aux
-	rcall delay_500ms
-	inc index
-	cpi index, 9
-	brlo display1   ; se index < 9, continua display1
-	rjmp display2   ; senão, vai para display2
-
-display2:
-	sbi PORTB, 7    ; liga PB7
-	ldi ZH, high(table*2)  
-    ldi ZL, low(table*2)
-    add ZL, index2       
-    adc ZH, r1           
-
-    ; Lê padrão da tabela
-    lpm aux, Z
-    out PORTB, aux
-	rcall delay_500ms
-	inc index2
-	cbi PORTB, 7    ; desliga PB7
 	ldi index, 0
-	cpi index2, 9
-	brlo display1   ; se index2 < 9, volta pro display1
-	rjmp zerar
-
-zerar:
 	ldi index2, 0
-	rjmp display1
 
-delay_500ms:
-	ldi		r20, 64
-delay2:
-	ldi		r19, 128
-delay1:
-	ldi		r18, 255
-delay0:
-	dec		r18
-	brne	delay0
-	dec		r19
-	brne	delay1
-	dec		r20
-	brne	delay2
+loop:
+	; Exibe unidade (PB7 desligado)
+	cbi PORTB, 7              ; Desliga PB7 (seleciona unidade)
+	rcall display_digit_unidade
+	rcall delay_5ms
+
+	; Exibe dezena (PB7 ligado)
+	sbi PORTB, 7              ; Liga PB7 (seleciona dezena)
+	rcall display_digit_dezena
+	rcall delay_5ms
+
+	; Incrementa contador
+	rcall incrementa_contador
+
+	rjmp loop
+
+; --- Rotinas de exibição ---
+display_digit_unidade:
+	ldi ZH, high(table*2)
+	ldi ZL, low(table*2)
+	add ZL, index
+	adc ZH, r1
+	lpm aux, Z
+	out PORTB, aux
 	ret
+
+display_digit_dezena:
+	ldi ZH, high(table*2)
+	ldi ZL, low(table*2)
+	add ZL, index2
+	adc ZH, r1
+	lpm aux, Z
+	out PORTB, aux
+	ret
+
+; --- Incrementa contador (0-99) ---
+incrementa_contador:
+	inc index
+	cpi index, 10
+	brlo fim_incrementa
+	ldi index, 0
+	inc index2
+	cpi index2, 10
+	brlo fim_incrementa
+	ldi index2, 0
+fim_incrementa:
+	ret
+
+; --- Delay 5ms aproximado ---
+delay_5ms:
+	ldi r20, 5
+delay_outer:
+	ldi r19, 80
+delay_middle:
+	ldi r18, 255
+delay_inner:
+	dec r18
+	brne delay_inner
+	dec r19
+	brne delay_middle
+	dec r20
+	brne delay_outer
+	ret
+oq está errado
